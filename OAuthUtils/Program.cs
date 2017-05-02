@@ -15,6 +15,12 @@ namespace OAuthUtils
                 
                 return new Commands().Execute(args);
             }
+            catch(CommandException cmd)
+            {
+                _logger?.LogCritical(cmd.Message);
+
+                return 1;
+            }
             catch (Exception ex)
             {
                 _logger?.LogCritical(new EventId(), ex, "An unexpected exception occured");

@@ -18,8 +18,8 @@ namespace OAuthUtils
         {
             Name = "verify";
             Description = "verifies a base64url encoded JWT";
-            _audiences = Option("-a | --aud", "The list of allowed ", CommandOptionType.MultipleValue);
-            _issuers = Option("-i | --issuers", "The list of allowed ", CommandOptionType.MultipleValue);
+            _audiences = Option("-a | --aud", "The list of allowed audiences", CommandOptionType.MultipleValue);
+            _issuers = Option("-i | --issuers", "The list of allowed issuers", CommandOptionType.MultipleValue);
             HelpOption("-h | -? | --help");
             TokenOperation = VerifyToken;
             OnExecute((Func<int>)ExecuteCommand);
@@ -36,14 +36,21 @@ namespace OAuthUtils
 
                 TokenValidationParameters validationParameters = new TokenValidationParameters
                 {
-                    //ValidIssuers = ,
-                    //ValidAudiences = ,
+                    ValidIssuers = _issuers.Values,
+                    ValidAudiences = _audiences.Values,
                     IssuerSigningKeys = openIdConfig.SigningKeys
                 };
 
                 SecurityToken validatedToken;
                 JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-                var user = handler.ValidateToken(encodedToken, validationParameters, out validatedToken);
+                try
+                {
+                    var user = handler.ValidateToken(encodedToken, validationParameters, out validatedToken);
+                }
+                catch (Exception ex)
+                {
+                    throw new CommandException(ex.Message);
+                }
             }
             else
             {
