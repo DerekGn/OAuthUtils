@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace OAuthUtils
+namespace OAuthUtils.TokenOperations
 {
     internal abstract class TokenCommand<T> : CommandLineApplication
     {

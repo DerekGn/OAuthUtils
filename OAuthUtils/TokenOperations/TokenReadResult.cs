@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace OAuthUtils
+namespace OAuthUtils.TokenOperations
 {
     internal class TokenReadResult
     {
