@@ -8,7 +8,6 @@ namespace OAuthUtils.TokenOperations
 {
     internal abstract class TokenCommand<T> : CommandLineApplication
     {
-        protected Action<string> TokenOperation;
         protected readonly ILogger<T> Logger;
 
         private readonly CommandOption _token;
@@ -16,23 +15,21 @@ namespace OAuthUtils.TokenOperations
         public TokenCommand(bool throwOnUnexpectedArg = true) : base(throwOnUnexpectedArg)
         {
             Logger = Logging.CreateLogger<T>();
+
+            HelpOption("-h | -? | --help");
+
             _token = Option("-t | --token", "The token to verify as a base64url encoded string", CommandOptionType.SingleValue);
+
+            OnExecute((Func<int>)ExecuteCommand);
         }
 
-        protected int ExecuteCommand()
+        private int ExecuteCommand()
         {
             int result = 0;
             
             if (_token.HasValue())
             {
-                if (TokenOperation != null)
-                {
-                    TokenOperation(_token.Value());
-                }
-                else
-                {
-                    Logger.LogError("no token operation specified");
-                }
+                ProcessToken(_token.Value());
             }
             else
             {
@@ -42,6 +39,8 @@ namespace OAuthUtils.TokenOperations
 
             return result;
         }
+
+        internal abstract void ProcessToken(string token);
 
         protected static TokenReadResult ReadToken(string encodedToken)
         {

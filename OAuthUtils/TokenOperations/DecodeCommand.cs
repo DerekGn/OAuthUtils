@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace OAuthUtils.TokenOperations
 {
@@ -9,16 +8,13 @@ namespace OAuthUtils.TokenOperations
         {
             Name = "decode";
             Description = "decodes a base64url encoded JWT";
-            HelpOption("-h | -? | --help");
-            TokenOperation = DecodeToken;
-            OnExecute((Func<int>) ExecuteCommand);
         }
-        
-        private void DecodeToken(string encodedToken)
-        {
-            TokenReadResult result = ReadToken(encodedToken);
 
-            if(result.Success)
+        internal override void ProcessToken(string token)
+        {
+            TokenReadResult result = ReadToken(token);
+
+            if (result.Success)
             {
                 Logger.LogInformation(result.Token.ToString());
             }

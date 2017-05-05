@@ -19,20 +19,17 @@ namespace OAuthUtils.TokenOperations
         {
             Name = "verify";
             Description = "verifies a base64url encoded JWT";
-            _lifetime = Option("-l | --lifetimeIgnore", "Ignore token lifetime", CommandOptionType.NoValue);
+            _lifetime = Option("-l | --lifetime", "Ignore token lifetime", CommandOptionType.NoValue);
             _audiences = Option("-a | --aud", "The list of allowed audiences", CommandOptionType.MultipleValue);
-            _issuers = Option("-i | --issuers", "The list of allowed issuers", CommandOptionType.MultipleValue);
-            HelpOption("-h | -? | --help");
-            TokenOperation = VerifyToken;
-            OnExecute((Func<int>)ExecuteCommand);
+            _issuers = Option("-i | --iss", "The list of allowed issuers", CommandOptionType.MultipleValue);
         }
 
-        private void VerifyToken(string encodedToken)
+        internal override void ProcessToken(string token)
         {
-            TokenReadResult result = ReadToken(encodedToken);
+            TokenReadResult result = ReadToken(token);
 
             if (result.Success)
-            {                
+            {
                 IConfigurationManager<OpenIdConnectConfiguration> configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>($"{result.Token.Issuer.EnsureTrailingSlash()}.well-known/openid-configuration", new OpenIdConnectConfigurationRetriever());
                 OpenIdConnectConfiguration openIdConfig = configurationManager.GetConfigurationAsync(CancellationToken.None).Result;
 
@@ -43,12 +40,12 @@ namespace OAuthUtils.TokenOperations
                     IssuerSigningKeys = openIdConfig.SigningKeys,
                     ValidateLifetime = _lifetime.HasValue()
                 };
-                
+
                 SecurityToken validatedToken;
                 JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
                 try
                 {
-                    var user = handler.ValidateToken(encodedToken, validationParameters, out validatedToken);
+                    var user = handler.ValidateToken(token, validationParameters, out validatedToken);
 
                     Logger.LogInformation("token is valid");
                 }
