@@ -13,6 +13,7 @@ namespace OAuthUtils
             Commands.Add(new ClientCommand());
             Commands.Add(new ResourceCommand());
             Commands.Add(new IntrospectionCommand());
+            Commands.Add(new UserInfoCommand());
             HelpOption("-h | -? | --help");
         }
     }
